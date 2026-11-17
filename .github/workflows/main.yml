@@ -15,21 +15,18 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: 8.9
-      - name: Find project
+      - name: Unpack and find project
         id: find
         run: |
-          echo "== files in repo =="
-          find . -not -path './.git/*' -type f | head -40 || true
+          mkdir -p _unz
+          for z in *.zip; do [ -f "$z" ] && unzip -q -o "$z" -d _unz; done
           F=$(find . -name settings.gradle.kts -not -path './.git/*' | head -1)
           if [ -z "$F" ]; then
-            echo "::error::settings.gradle.kts not found - project files are not in the repository"
+            echo "::error::settings.gradle.kts not found"
             exit 1
           fi
           echo "dir=$(dirname "$F")" >> "$GITHUB_OUTPUT"
       - name: Build APK
         working-directory: ${{ steps.find.outputs.dir }}
         run: gradle assembleRelease --no-daemon --stacktrace
-      - uses: actions/upload-artifact@v4
-        with:
-          name: E-scooter-App-2.2
-          path: ${{ steps.find.outputs.dir }}/app/build/outputs/apk/release/*.apk
+      -
