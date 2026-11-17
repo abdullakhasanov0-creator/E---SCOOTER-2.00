@@ -29,4 +29,7 @@ jobs:
       - name: Build APK
         working-directory: ${{ steps.find.outputs.dir }}
         run: gradle assembleRelease --no-daemon --stacktrace
-      -
+      - uses: actions/upload-artifact@v4
+        with:
+          name: E-scooter-App-2.2
+          path: ${{ steps.find.outputs.dir }}/app/build/outputs/apk/release/*.apk
